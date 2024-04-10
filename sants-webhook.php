@@ -67,15 +67,31 @@ function sants_handle_webhook($request) {
         error_log('Webhook received: ' . print_r($parameters, true));
     }
 
+    
+
     $email = !empty($parameters['email']) ? $parameters['email'] : '';
     $firstName = !empty($parameters['first_name']) ? $parameters['first_name'] : '';
+    $lastName = !empty($parameters['last_name']) ? $parameters['last_name'] : '';
+    $highestQualification = isset($parameters['highest_qualification']) ? $parameters['highest_qualification'] : 'Not provided';
+    $callback = isset($parameters['callback']) ? $parameters['callback'] : 'Not provided';
 
+    // //DEBUG EMAIL
+    // // Convert the parameters to a string
+    // $raw_parameters = print_r($request->get_params(), true);
+
+    // // Email the raw parameters for debugging
+    // $debug_email = 'bester.dries@gmail.com';
+    // $debug_subject = 'Webhook Debug Information';
+    // wp_mail($debug_email, $debug_subject, $raw_parameters);
 
     $data = [
         "contacts" => [
             [
                 "email" => $email,
                 "first_name" => $firstName,
+                "last_name" => $lastName,
+                "highest_qualification" => $highestQualification,
+                "callback" => $callback,
             ]
         ]
     ];
@@ -106,9 +122,22 @@ function sants_handle_webhook($request) {
         error_log('HTTP Status Code: ' . $httpStatusCode);
     }
 
-    $body = 'A new lead has been received and processed: ' . print_r($parameters, true);
-    $body .= "\n\nSendGrid Response:\n" . $response;
+    $body = "A new lead has been received and processed:\n";
+    $body .= "Page URL: " . (isset($parameters['page_url']) ? $parameters['page_url'] : 'Not Provided') . "\n";
+    $body .= "Email: " . $email . "\n";
+    $body .= "First Name: " . $firstName . "\n";
+    $body .= "Last Name: " . $lastName . "\n";
+    $body .= "Highest Qualification: " . $highestQualification . "\n";
+    $body .= "Callback Request: " . $callback . "\n";
+    $body .= "Variant: " . (isset($parameters['variant']) ? $parameters['variant'] : 'Not Provided') . "\n";
+    $body .= "IP Address: " . (isset($parameters['ip_address']) ? $parameters['ip_address'] : 'Not Provided') . "\n";
+    $body .= "Page Name: " . (isset($parameters['page_name']) ? $parameters['page_name'] : 'Not Provided') . "\n";
+    $body .= "Page UUID: " . (isset($parameters['page_uuid']) ? $parameters['page_uuid'] : 'Not Provided') . "\n";
+    $body .= "Date Submitted: " . (isset($parameters['date_submitted']) ? $parameters['date_submitted'] : 'Not Provided') . "\n";
+    $body .= "Time Submitted: " . (isset($parameters['time_submitted']) ? $parameters['time_submitted'] : 'Not Provided') . "\n\n";
+    $body .= "SendGrid Response:\n" . $response;
     $body .= "\nHTTP Status Code: " . $httpStatusCode;
+
 
     $to = 'bester.dries@gmail.com';
     $subject = 'Lead Received and Processed';
