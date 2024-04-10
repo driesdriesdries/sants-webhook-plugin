@@ -67,8 +67,6 @@ function sants_handle_webhook($request) {
         error_log('Webhook received: ' . print_r($parameters, true));
     }
 
-    
-
     $email = !empty($parameters['email']) ? $parameters['email'] : '';
     $firstName = !empty($parameters['first_name']) ? $parameters['first_name'] : '';
     $lastName = !empty($parameters['last_name']) ? $parameters['last_name'] : '';
@@ -122,26 +120,33 @@ function sants_handle_webhook($request) {
         error_log('HTTP Status Code: ' . $httpStatusCode);
     }
 
-    $body = "A new lead has been received and processed:\n";
-    $body .= "Page URL: " . (isset($parameters['page_url']) ? $parameters['page_url'] : 'Not Provided') . "\n";
-    $body .= "Email: " . $email . "\n";
-    $body .= "First Name: " . $firstName . "\n";
-    $body .= "Last Name: " . $lastName . "\n";
-    $body .= "Highest Qualification: " . $highestQualification . "\n";
-    $body .= "Callback Request: " . $callback . "\n";
-    $body .= "Variant: " . (isset($parameters['variant']) ? $parameters['variant'] : 'Not Provided') . "\n";
-    $body .= "IP Address: " . (isset($parameters['ip_address']) ? $parameters['ip_address'] : 'Not Provided') . "\n";
-    $body .= "Page Name: " . (isset($parameters['page_name']) ? $parameters['page_name'] : 'Not Provided') . "\n";
-    $body .= "Page UUID: " . (isset($parameters['page_uuid']) ? $parameters['page_uuid'] : 'Not Provided') . "\n";
-    $body .= "Date Submitted: " . (isset($parameters['date_submitted']) ? $parameters['date_submitted'] : 'Not Provided') . "\n";
-    $body .= "Time Submitted: " . (isset($parameters['time_submitted']) ? $parameters['time_submitted'] : 'Not Provided') . "\n\n";
-    $body .= "SendGrid Response:\n" . $response;
-    $body .= "\nHTTP Status Code: " . $httpStatusCode;
+    // Convert callback value to a more readable format
+    $callback_readable = $callback === 'Yes' ? 'Requested' : 'Not Requested';
 
+    // Create a more readable email format using HTML
+    $body = "<html><body>";
+    $body .= "<h2>A new lead has been received and processed:</h2>";
+    $body .= "<p><strong>Page URL:</strong> " . (isset($parameters['page_url']) ? $parameters['page_url'] : 'Not Provided') . "</p>";
+    $body .= "<p><strong>Email:</strong> " . $email . "</p>";
+    $body .= "<p><strong>First Name:</strong> " . $firstName . "</p>";
+    $body .= "<p><strong>Last Name:</strong> " . $lastName . "</p>";
+    $body .= "<p><strong>Highest Qualification:</strong> " . $highestQualification . "</p>";
+    $body .= "<p><strong>Callback Request:</strong> " . $callback_readable . "</p>";
+    $body .= "<p><strong>Variant:</strong> " . (isset($parameters['variant']) ? $parameters['variant'] : 'Not Provided') . "</p>";
+    $body .= "<p><strong>IP Address:</strong> " . (isset($parameters['ip_address']) ? $parameters['ip_address'] : 'Not Provided') . "</p>";
+    $body .= "<p><strong>Page Name:</strong> " . (isset($parameters['page_name']) ? $parameters['page_name'] : 'Not Provided') . "</p>";
+    $body .= "<p><strong>Page UUID:</strong> " . (isset($parameters['page_uuid']) ? $parameters['page_uuid'] : 'Not Provided') . "</p>";
+    $body .= "<p><strong>Date Submitted:</strong> " . (isset($parameters['date_submitted']) ? $parameters['date_submitted'] : 'Not Provided') . "</p>";
+    $body .= "<p><strong>Time Submitted:</strong> " . (isset($parameters['time_submitted']) ? $parameters['time_submitted'] : 'Not Provided') . "</p>";
+    $body .= "<h3>SendGrid Response:</h3><pre>" . $response . "</pre>";
+    $body .= "<p><strong>HTTP Status Code:</strong> " . $httpStatusCode . "</p>";
+    $body .= "</body></html>";
+
+    // Set content-type header for HTML email
+    $headers = array('Content-Type: text/html; charset=UTF-8');
 
     $to = 'bester.dries@gmail.com';
     $subject = 'Lead Received and Processed';
-    $headers = array('Content-Type: text/html; charset=UTF-8');
     wp_mail($to, $subject, $body, $headers);
 
     return new WP_REST_Response(array(
