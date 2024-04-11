@@ -88,8 +88,10 @@ function sants_handle_webhook($request) {
                 "email" => $email,
                 "first_name" => $firstName,
                 "last_name" => $lastName,
-                "highest_qualification" => $highestQualification,
-                "callback" => $callback,
+                "custom_fields" => [
+                    "e3_T" => $highestQualification, // Custom field for highest qualification
+                    "e2_T" => $callback, // Custom field for callback
+                ]
             ]
         ]
     ];
