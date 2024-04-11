@@ -72,6 +72,7 @@ function sants_handle_webhook($request) {
     $lastName = !empty($parameters['last_name']) ? $parameters['last_name'] : '';
     $highestQualification = isset($parameters['highest_qualification']) ? $parameters['highest_qualification'] : 'Not provided';
     $callback = isset($parameters['callback']) ? $parameters['callback'] : 'Not provided';
+    $productOfInterest = isset($parameters['product_of_interest']) ? $parameters['product_of_interest'] : 'Not provided';
 
     // //DEBUG EMAIL
     // // Convert the parameters to a string
@@ -91,6 +92,7 @@ function sants_handle_webhook($request) {
                 "custom_fields" => [
                     "e3_T" => $highestQualification, // Custom field for highest qualification
                     "e2_T" => $callback, // Custom field for callback
+                    "e4_T" => $productOfInterest, // Add this line; replace "e4_T" with your SendGrid custom field ID for product_of_interest
                 ]
             ]
         ]
@@ -134,6 +136,7 @@ function sants_handle_webhook($request) {
     $body .= "<p><strong>Last Name:</strong> " . $lastName . "</p>";
     $body .= "<p><strong>Highest Qualification:</strong> " . $highestQualification . "</p>";
     $body .= "<p><strong>Callback Request:</strong> " . $callback_readable . "</p>";
+    $body .= "<p><strong>Product of Interest:</strong> " . $productOfInterest . "</p>";
     $body .= "<p><strong>Variant:</strong> " . (isset($parameters['variant']) ? $parameters['variant'] : 'Not Provided') . "</p>";
     $body .= "<p><strong>IP Address:</strong> " . (isset($parameters['ip_address']) ? $parameters['ip_address'] : 'Not Provided') . "</p>";
     $body .= "<p><strong>Page Name:</strong> " . (isset($parameters['page_name']) ? $parameters['page_name'] : 'Not Provided') . "</p>";
